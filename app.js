@@ -1,0 +1,20 @@
+const menu = {
+  kebabs: { num:'01', title:'LE GOÛT<br/>DU <em>KEBAB.</em>', desc:'Sandwichs et recettes emblématiques : à toi de choisir ton envie.', entries:[['KEBAB','Le grand classique.'],['CHICKEN TIKKA','Pour varier les plaisirs.'],['BOULETTES KEFTA','Une saveur à découvrir.'],['ADANA','Une inspiration turque.']] },
+  tacos: { num:'02', title:'TEAM<br/><em>TACOS.</em>', desc:'Une faim de tacos ? Retrouve les versions proposées sur la carte.', entries:[['TACOS 2 VIANDES','Une option pour les belles faims.'],['TACOS 3 VIANDES','Quand tu vois les choses en grand.'],['CHOISIS TON ENVIE','Garnitures et compositions à confirmer.'],['UN PEU PLUS ?','Demande les accompagnements disponibles.']] },
+  assiettes: { num:'03', title:'CÔTÉ<br/><em>ASSIETTES.</em>', desc:'Prends le temps de profiter des spécialités de la carte.', entries:[['ASSIETTE KEBAB','L’incontournable version assiette.'],['ASSIETTE CHICKEN TIKKA','À découvrir.'],['ASSIETTE KEFTA','Pour les amateurs de spécialités.'],['ASSIETTE MIXTE','Une sélection à demander au comptoir.']] },
+  paninis: { num:'04', title:'PAUSE<br/><em>PANINI.</em>', desc:'Pour une petite ou une grande pause gourmande.', entries:[['PANINI FROMAGES','Version fondante.'],['PANINI KEBAB','Le panini façon kebab.'],['PANINI NUTELLA','Pour une note sucrée.'],['AUTRES ENVIES ?','Demande la sélection disponible.']] },
+  snacks: { num:'05', title:'PETITE<br/><em>FAIM.</em>', desc:'À grignoter, à partager… ou à garder pour soi !', entries:[['NUGGETS','Le classique des petites faims.'],['TENDERS','Une valeur sûre.'],['MOZZA STICKS','Un snack gourmand.'],['FRITES','Petite ou grande envie ?']] }
+};
+const tabs = [...document.querySelectorAll('.tab')];
+const panel = document.querySelector('#menu-panel');
+const left = panel?.querySelector('.menu-panel-left');
+const items = document.querySelector('#menu-items');
+function selectCategory(cat, focus=false){
+ const data=menu[cat]; if(!data || !panel || !left || !items) return;
+ tabs.forEach(t=>{const selected=t.dataset.category===cat;t.classList.toggle('is-active',selected);t.setAttribute('aria-selected',String(selected));t.tabIndex=selected?0:-1;if(selected){panel.setAttribute('aria-labelledby',t.id);if(focus)t.focus();}});
+ left.innerHTML=`<span class="menu-count">${data.num} / 05</span><h3>${data.title}</h3><p>${data.desc}</p><div class="menu-photo menu-photo-${cat}" role="img" aria-label="Photographie illustrative de street-food"></div>`;
+ items.innerHTML=''; data.entries.forEach(([name,description],i)=>{const el=document.createElement('div');el.className='menu-item';const no=document.createElement('span');no.className='item-no';no.textContent=String(i+1).padStart(2,'0');const content=document.createElement('div');const h=document.createElement('h4');h.textContent=name;const p=document.createElement('p');p.textContent=description;content.append(h,p);const arrow=document.createElement('span');arrow.className='item-arrow';arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';el.append(no,content,arrow);items.append(el);});
+}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>selectCategory(t.dataset.category));t.addEventListener('keydown',event=>{let next=-1;if(event.key==='ArrowRight')next=(i+1)%tabs.length;if(event.key==='ArrowLeft')next=(i+tabs.length-1)%tabs.length;if(event.key==='Home')next=0;if(event.key==='End')next=tabs.length-1;if(next!==-1){event.preventDefault();selectCategory(tabs[next].dataset.category,true);}});});
+const toggle=document.querySelector('.mobile-menu-toggle');const mobileNav=document.querySelector('#mobile-nav');if(toggle&&mobileNav){toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Fermer le menu':'Ouvrir le menu');mobileNav.hidden=!open;});mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mobileNav.hidden=true;toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Ouvrir le menu');}));}
+const year=document.querySelector('#year');if(year)year.textContent=new Date().getFullYear();
